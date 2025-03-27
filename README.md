@@ -49,6 +49,11 @@ Para esto, realice lo siguiente:
 	```
 3. Compile y ejecute su aplicación. Abra la aplicación en varias pestañas diferentes (para evitar problemas con el caché del navegador, use el modo 'incógnito' en cada prueba).
 4. Ingrese los datos, ejecute la acción del botón, y verifique que en todas la pestañas se haya lanzado la alerta con los datos ingresados.
+### Prueba
+
+Como se puede evidenciar en la imagen se presenta la alerta en cada instacia conectada.
+
+![Descripción de la imagen](img/img.png)
 
 5. Haga commit de lo realizado, para demarcar el avance de la parte 2.
 
@@ -64,6 +69,12 @@ Para hacer mas útil la aplicación, en lugar de capturar las coordenadas con ca
 1. Haga que el 'callback' asociado al tópico /topic/newpoint en lugar de mostrar una alerta, dibuje un punto en el canvas en las coordenadas enviadas con los eventos recibidos. Para esto puede [dibujar un círculo de radio 1](http://www.w3schools.com/html/html5_canvas.asp).
 4. Ejecute su aplicación en varios navegadores (y si puede en varios computadores, accediendo a la aplicación mendiante la IP donde corre el servidor). Compruebe que a medida que se dibuja un punto, el mismo es replicado en todas las instancias abiertas de la aplicación.
 
+### Prueba
+
+Se muestra correcto funcionamiento ahora trabajando con un canvas, en vez del formulario.
+
+![Descripción de la imagen](img/img_1.png)
+
 5. Haga commit de lo realizado, para marcar el avance de la parte 2.
 
 	```bash
@@ -78,6 +89,12 @@ Ajuste la aplicación anterior para que pueda manejar más de un dibujo a la vez
 2. Modifique la aplicación para que, en lugar de conectarse y suscribirse automáticamente (en la función init()), lo haga a través de botón 'conectarse'. Éste, al oprimirse debe realizar la conexión y suscribir al cliente a un tópico que tenga un nombre dinámico, asociado el identificador ingresado, por ejemplo: /topic/newpoint.25, topic/newpoint.80, para los dibujos 25 y 80 respectivamente.
 3. De la misma manera, haga que las publicaciones se realicen al tópico asociado al identificador ingresado por el usuario.
 4. Rectifique que se puedan realizar dos dibujos de forma independiente, cada uno de éstos entre dos o más clientes.
+
+### Prueba
+
+Se puede evidenciar como se realizan los dos dibujos de forma independiente.
+
+![Descripción de la imagen](img/img_2.png)
 
 	```bash
 	git commit -m "PARTE 3".
@@ -122,8 +139,18 @@ Para ver cómo manejar esto desde el manejador de eventos STOMP del servidor, re
 	2. El manejador de eventos de /app/newpoint.{numdibujo}, además de propagar los puntos a través del tópico '/topic/newpoints', llevará el control de los puntos recibidos(que podrán haber sido dibujados por diferentes clientes). Cuando se completen tres o más puntos, publicará el polígono en el tópico '/topic/newpolygon'. Recuerde que esto se realizará concurrentemente, de manera que REVISE LAS POSIBLES CONDICIONES DE CARRERA!. También tenga en cuenta que desde el manejador de eventos del servidor se tendrán N dibujos independientes!.
 
 	3. El cliente, ahora también se suscribirá al tópico '/topic/newpolygon'. El 'callback' asociado a la recepción de eventos en el mismo debe, con los datos recibidos, dibujar un polígono, [tal como se muestran en ese ejemplo](http://www.arungudelli.com/html5/html5-canvas-polygon/).
-	4. Verifique la funcionalidad: igual a la anterior, pero ahora dibujando polígonos cada vez que se agreguen cuatro puntos.
-	
+
+### Prueba
+Se muestra el funcionamiento de la formación de triangulos en el canvas.
+
+![Descripción de la imagen](img/img_3.png)
+
+4. Verifique la funcionalidad: igual a la anterior, pero ahora dibujando polígonos cada vez que se agreguen cuatro puntos.
+
+### Prueba
+Se muestra el funcionamiento de la formación de poligonos de 4 vertices en el canvas.
+
+![Descripción de la imagen](img/img_4.png)
 	
 5. A partir de los diagramas dados en el archivo ASTAH incluido, haga un nuevo diagrama de actividades correspondiente a lo realizado hasta este punto, teniendo en cuenta el detalle de que ahora se tendrán tópicos dinámicos para manejar diferentes dibujos simultáneamente.
 

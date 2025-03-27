@@ -27,6 +27,31 @@ var app = (function () {
         ctx.fill();
     };
 
+    // Función para dibujar un polígono
+    // En la función de dibujo de polígonos
+    var drawPolygon = function(polygon) {
+        if (!polygon.points || polygon.points.length < 4) {
+            console.log("Se recibió un polígono con menos de 4 puntos");
+            return;
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(polygon.points[0].x, polygon.points[0].y);
+
+        for (var i = 1; i < polygon.points.length; i++) {
+            ctx.lineTo(polygon.points[i].x, polygon.points[i].y);
+        }
+
+        ctx.closePath();
+        ctx.strokeStyle = '#FF5722';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Relleno con color diferente para distinguir polígonos de 4 lados
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.0)'; // Verde semi-transparente
+        ctx.fill();
+    };
+
     // Función para manejar los puntos recibidos
     var handleReceivedPoint = function(message) {
         try {
@@ -34,6 +59,16 @@ var app = (function () {
             drawPoint(receivedPoint);
         } catch (e) {
             console.error("Error al procesar punto recibido:", e);
+        }
+    };
+
+    // Función para manejar los polígonos recibidos
+    var handleReceivedPolygon = function(message) {
+        try {
+            var polygon = JSON.parse(message.body);
+            drawPolygon(polygon);
+        } catch (e) {
+            console.error("Error al procesar polígono recibido:", e);
         }
     };
 
@@ -56,8 +91,8 @@ var app = (function () {
         // Dibujar el punto localmente (en verde para distinguirlo)
         drawPoint(point, '#00AA00');
 
-        // Publicar el punto al tópico actual
-        stompClient.send("/topic/newpoint." + currentTopic, {}, JSON.stringify(point));
+        // Publicar el punto al endpoint del servidor
+        stompClient.send("/app/newpoint." + currentTopic, {}, JSON.stringify(point));
     };
 
     // Función para actualizar la interfaz según el estado de conexión
@@ -121,15 +156,18 @@ var app = (function () {
             stompClient.connect({}, function(frame) {
                 console.log('Conectado: ' + frame);
 
-                // Suscribirse al tópico específico
-                var topic = '/topic/newpoint.' + currentTopic;
-                stompClient.subscribe(topic, handleReceivedPoint);
+                // Suscribirse a los tópicos específicos
+                var pointTopic = '/topic/newpoint.' + currentTopic;
+                var polygonTopic = '/topic/newpolygon.' + currentTopic;
+
+                stompClient.subscribe(pointTopic, handleReceivedPoint);
+                stompClient.subscribe(polygonTopic, handleReceivedPolygon);
 
                 isConnected = true;
                 updateUI();
                 clearCanvas();
 
-                console.log(`Suscrito al tópico: ${topic}`);
+                console.log(`Suscrito a los tópicos: ${pointTopic} y ${polygonTopic}`);
             }, function(error) {
                 console.error('Error de conexión:', error);
                 alert("Error al conectar al servidor");
@@ -147,13 +185,6 @@ var app = (function () {
             currentTopic = null;
             updateUI();
             clearCanvas();
-        },
-
-        publishPoint: function(px, py) {
-            if (!isConnected || !stompClient) return;
-
-            var point = new Point(px, py);
-            stompClient.send("/topic/newpoint." + currentTopic, {}, JSON.stringify(point));
         }
     };
 })();
